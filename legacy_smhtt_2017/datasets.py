@@ -1,11 +1,5 @@
-"""Database
-
-Dictionaries where the keys are the dataset names and the items
-lists containing the names of the files to be fetched.
-"""
-
-nominal_files = {
-    'data': [
+files = {
+    'singlemuon': [
         'SingleMuon_Run2017B_31Mar2018v1_13TeV_MINIAOD',
         'SingleMuon_Run2017C_31Mar2018v1_13TeV_MINIAOD',
         'SingleMuon_Run2017D_31Mar2018v1_13TeV_MINIAOD',

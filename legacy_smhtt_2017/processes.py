@@ -1,26 +1,7 @@
 from ntuple_processor.utils import Selection
 
 
-
-"""Base processes
-
-List of base processes, mostly containing only weights:
-    - triggerweight
-    - singlelepton_triggerweight
-    - tau_by_iso_id_weight
-    - ele_hlt_Z_vtx_weight
-    - lumi_weight
-    - DY_base_process_selection
-    - TT_process_selection
-    - VV_process_selection
-    - W_process_selection
-    - HTT_base_process_selection
-    - HTT_process_selection
-    - HWW_process_selection
-"""
-
-
-def triggerweight(channel):
+def _triggerweight(channel):
     weight = ("1.0", "triggerweight")
 
     singleMC = "singleTriggerMCEfficiencyWeightKIT_1"
@@ -65,7 +46,7 @@ def triggerweight(channel):
     return weight
 
 
-def singlelepton_triggerweight(channel):
+def _singlelepton_triggerweight(channel):
     weight = ("1.0","triggerweight")
 
     MCTau_1 = "((byTightDeepTau2017v2p1VSjet_1<0.5 && byMediumDeepTau2017v2p1VSjet_1>0.5)*crossTriggerMCEfficiencyWeight_medium_DeepTau_1 + (byTightDeepTau2017v2p1VSjet_1>0.5)*crossTriggerMCEfficiencyWeight_tight_DeepTau_1)"
@@ -82,7 +63,7 @@ def singlelepton_triggerweight(channel):
     return weight
 
 
-def tau_by_iso_id_weight(channel):
+def _tau_by_iso_id_weight(channel):
     weight = ("1.0","taubyIsoIdWeight")
     if "mt" in channel or "et" in channel:
         weight = ("((gen_match_2 == 5)*tauIDScaleFactorWeight_tight_DeepTau2017v2p1VSjet_2 + (gen_match_2 != 5))", "taubyIsoIdWeight")
@@ -92,17 +73,17 @@ def tau_by_iso_id_weight(channel):
     return weight
 
 
-def ele_hlt_Z_vtx_weight(channel):
+def _ele_hlt_Z_vtx_weight(channel):
     weight = ("1.0","eleHLTZvtxWeight")
     if "et" in channel:
         weight = ("(trg_singleelectron_35 || trg_singleelectron_32 || trg_singleelectron_27 || trg_crossele_ele24tau30)*0.991 + (!(trg_singleelectron_35 || trg_singleelectron_32 || trg_singleelectron_27 || trg_crossele_ele24tau30))*1.0", "eleHLTZvtxWeight")
     return weight
 
 
-lumi_weight = ("41.529 * 1000.0", "lumi")
+_lumi_weight = ("41.529 * 1000.0", "lumi")
 
 
-def DY_base_process_selection(channel):
+def _dy_base(channel):
     return Selection(
             name = "DY_base",
             weights = [
@@ -111,19 +92,19 @@ def DY_base_process_selection(channel):
                 ("idWeight_1*idWeight_2","idweight"),
                 ("isoWeight_1*isoWeight_2","isoweight"),
                 ("trackWeight_1*trackWeight_2","trackweight"),
-                triggerweight(channel),
+                _triggerweight(channel),
                 ("eleTauFakeRateWeight*muTauFakeRateWeight", "leptonTauFakeRateWeight"),
                 ("(gen_match_2==1 || gen_match_2==3)*(((abs(eta_1) < 1.46) * 0.88) + ((abs(eta_1) > 1.5588) * 0.51))+!(gen_match_2==1 || gen_match_2==3)", "eletauFakeRateWeightFix"),
-                tau_by_iso_id_weight(channel),
-                ele_hlt_Z_vtx_weight(channel),
+                _tau_by_iso_id_weight(channel),
+                _ele_hlt_Z_vtx_weight(channel),
                 ("zPtReweightWeight", "zPtReweightWeight"),
                 ("prefiringweight", "prefireWeight"),
-                lumi_weight
+                _lumi_weight
                 ]
             )
 
 
-def TT_process_selection(channel):
+def tt(channel):
     return Selection(
     name = "TT",
     weights = [
@@ -135,155 +116,127 @@ def TT_process_selection(channel):
         ("isoWeight_1*isoWeight_2","isoweight"),
         ("trackWeight_1*trackWeight_2","trackweight"),
         ("topPtReweightWeight", "topPtReweightWeight"),
-        triggerweight(channel),
+        _triggerweight(channel),
         ("eleTauFakeRateWeight*muTauFakeRateWeight", "leptonTauFakeRateWeight"),
-        tau_by_iso_id_weight(channel),
-        ele_hlt_Z_vtx_weight(channel),
+        _tau_by_iso_id_weight(channel),
+        _ele_hlt_Z_vtx_weight(channel),
         ("prefiringweight", "prefireWeight"),
-        lumi_weight
+        _lumi_weight
         ]
     )
 
 
-def VV_process_selection(channel):
+def vv(channel):
     return Selection(
-    name = "VV",
-    weights = [
-        ("generatorWeight", "generatorWeight"),
-        ("numberGeneratedEventsWeight", "numberGeneratedEventsWeight"),
-        ("puweight", "puweight"),
-        ("idWeight_1*idWeight_2","idweight"),
-        ("isoWeight_1*isoWeight_2","isoweight"),
-        ("trackWeight_1*trackWeight_2","trackweight"),
-        triggerweight(channel),
-        ("eleTauFakeRateWeight*muTauFakeRateWeight", "leptonTauFakeRateWeight"),
-        tau_by_iso_id_weight(channel),
-        ele_hlt_Z_vtx_weight(channel),
-        ("crossSectionPerEventWeight", "crossSectionPerEventWeight"),
-        ("prefiringweight", "prefireWeight"),
-        lumi_weight
-        ]
-    )
+        name = "VV",
+        weights = [
+            ("generatorWeight", "generatorWeight"),
+            ("numberGeneratedEventsWeight", "numberGeneratedEventsWeight"),
+            ("puweight", "puweight"),
+            ("idWeight_1*idWeight_2","idweight"),
+            ("isoWeight_1*isoWeight_2","isoweight"),
+            ("trackWeight_1*trackWeight_2","trackweight"),
+            _triggerweight(channel),
+            ("eleTauFakeRateWeight*muTauFakeRateWeight", "leptonTauFakeRateWeight"),
+            _tau_by_iso_id_weight(channel),
+            _ele_hlt_Z_vtx_weight(channel),
+            ("crossSectionPerEventWeight", "crossSectionPerEventWeight"),
+            ("prefiringweight", "prefireWeight"),
+            _lumi_weight
+            ]
+        )
 
 
-def W_process_selection(channel):
+def w(channel):
     return Selection(
-    name = "W",
-    weights = [
-        ("generatorWeight", "generatorWeight"),
-        ("((0.000824363*((npartons <= 0 || npartons >= 5)*1.0 + (npartons == 1)*0.1713 + (npartons == 2)*0.1062 + (npartons == 3)*0.0652 + (npartons == 4)*0.0645)) * (genbosonmass>=0.0) + numberGeneratedEventsWeight * crossSectionPerEventWeight * (genbosonmass<0.0))", "wj_stitching_weight"),
-        ("puweight", "puweight"),
-        ("idWeight_1*idWeight_2","idweight"),
-        ("isoWeight_1*isoWeight_2","isoweight"),
-        ("trackWeight_1*trackWeight_2","trackweight"),
-        triggerweight(channel),
-        ("eleTauFakeRateWeight*muTauFakeRateWeight", "leptonTauFakeRateWeight"),
-        tau_by_iso_id_weight(channel),
-        ele_hlt_Z_vtx_weight(channel),
-        ("prefiringweight", "prefireWeight"),
-        lumi_weight
-        ]
-    )
+        name = "W",
+        weights = [
+            ("generatorWeight", "generatorWeight"),
+            ("((0.000824363*((npartons <= 0 || npartons >= 5)*1.0 + (npartons == 1)*0.1713 + (npartons == 2)*0.1062 + (npartons == 3)*0.0652 + (npartons == 4)*0.0645)) * (genbosonmass>=0.0) + numberGeneratedEventsWeight * crossSectionPerEventWeight * (genbosonmass<0.0))", "wj_stitching_weight"),
+            ("puweight", "puweight"),
+            ("idWeight_1*idWeight_2","idweight"),
+            ("isoWeight_1*isoWeight_2","isoweight"),
+            ("trackWeight_1*trackWeight_2","trackweight"),
+            _triggerweight(channel),
+            ("eleTauFakeRateWeight*muTauFakeRateWeight", "leptonTauFakeRateWeight"),
+            _tau_by_iso_id_weight(channel),
+            _ele_hlt_Z_vtx_weight(channel),
+            ("prefiringweight", "prefireWeight"),
+            _lumi_weight
+            ]
+        )
 
 
-def HTT_base_process_selection(channel):
+def _htt_base(channel):
     return Selection(
-    name = "HTT_base",
-    weights = [
-        ("generatorWeight", "generatorWeight"),
-        ("puweight", "puweight"),
-        ("idWeight_1*idWeight_2","idweight"),
-        ("isoWeight_1*isoWeight_2","isoweight"),
-        ("trackWeight_1*trackWeight_2","trackweight"),
-        triggerweight(channel),
-        ("eleTauFakeRateWeight*muTauFakeRateWeight", "leptonTauFakeRateWeight"),
-        tau_by_iso_id_weight(channel),
-        ele_hlt_Z_vtx_weight(channel),
-        ("prefiringweight", "prefireWeight"),
-        lumi_weight
-        ]
-    )
+        name = "HTT_base",
+        weights = [
+            ("generatorWeight", "generatorWeight"),
+            ("puweight", "puweight"),
+            ("idWeight_1*idWeight_2","idweight"),
+            ("isoWeight_1*isoWeight_2","isoweight"),
+            ("trackWeight_1*trackWeight_2","trackweight"),
+            _triggerweight(channel),
+            ("eleTauFakeRateWeight*muTauFakeRateWeight", "leptonTauFakeRateWeight"),
+            _tau_by_iso_id_weight(channel),
+            _ele_hlt_Z_vtx_weight(channel),
+            ("prefiringweight", "prefireWeight"),
+            _lumi_weight
+            ]
+        )
 
 
-def HTT_process_selection(channel):
-    HTT_weights = HTT_base_process_selection(channel).weights + [
+def htt(channel):
+    HTT_weights = _htt_base(channel).weights + [
         ("numberGeneratedEventsWeight", "numberGeneratedEventsWeight")
         ("crossSectionPerEventWeight", "crossSectionPerEventWeight"),
         ]
     return Selection(name = "HTT", weights = HTT_weights)
 
 
-def HWW_process_selection(channel):
+def hww(channel):
     return Selection(
-    name = "HWW",
-    weights = [
-        ("generatorWeight", "generatorWeight"),
-        ("numberGeneratedEventsWeight", "numberGeneratedEventsWeight"),
-        ("0.0857883*(abs(numberGeneratedEventsWeight - 2e-06) < 1e-07) + 1.1019558*(abs(numberGeneratedEventsWeight - 2e-06) >= 1e-07)", "crossSectionPerEventWeight"),
-        ("puweight", "puweight"),
-        ("idWeight_1*idWeight_2","idweight"),
-        ("isoWeight_1*isoWeight_2","isoweight"),
-        ("trackWeight_1*trackWeight_2","trackweight"),
-        triggerweight(channel),
-        ("eleTauFakeRateWeight*muTauFakeRateWeight", "leptonTauFakeRateWeight"),
-        tau_by_iso_id_weight(channel),
-        ele_hlt_Z_vtx_weight(channel),
-        ("prefiringweight", "prefireWeight"),
-        lumi_weight
-        ]
-    )
+        name = "HWW",
+        weights = [
+            ("generatorWeight", "generatorWeight"),
+            ("numberGeneratedEventsWeight", "numberGeneratedEventsWeight"),
+            ("0.0857883*(abs(numberGeneratedEventsWeight - 2e-06) < 1e-07) + 1.1019558*(abs(numberGeneratedEventsWeight - 2e-06) >= 1e-07)", "crossSectionPerEventWeight"),
+            ("puweight", "puweight"),
+            ("idWeight_1*idWeight_2","idweight"),
+            ("isoWeight_1*isoWeight_2","isoweight"),
+            ("trackWeight_1*trackWeight_2","trackweight"),
+            _triggerweight(channel),
+            ("eleTauFakeRateWeight*muTauFakeRateWeight", "leptonTauFakeRateWeight"),
+            _tau_by_iso_id_weight(channel),
+            _ele_hlt_Z_vtx_weight(channel),
+            ("prefiringweight", "prefireWeight"),
+            _lumi_weight
+            ]
+        )
 
 
-
-"""Built-on-top processes
-
-List of other processes meant to be put on top of base processes:
-    - DY_process_selection
-    - DY_nlo_process_selection
-    - ZTT_process_selection
-    - ZTT_nlo_process_selection
-    - ZTT_embedded_process_selection
-    - ZL_process_selection
-    - ZL_nlo_process_selection
-    - ZJ_process_selection
-    - ZJ_nlo_process_selection
-    - TTT_process_selection
-    - TTL_process_selection
-    - TTJ_process_selection
-    - VVT_process_selection
-    - VVJ_process_selection
-    - VVL_process_selection
-    - VH_process_selection
-    - WH_process_selection
-    - ZH_process_selection
-    - ttH_process_selection
-    - ggH125_process_selection
-    - qqH125_process_selection
-"""
-
-
-def DY_process_selection(channel):
-    DY_process_weights = DY_base_process_selection(channel).weights
+def dy(channel):
+    DY_process_weights = _dy_base(channel).weights
     DY_process_weights.append((
-        "((genbosonmass >= 50.0)*6.2139e-05*((npartons == 0 || npartons >= 5)*1.0 + (npartons == 1)*0.1743 + (npartons == 2)*0.3556 + (npartons == 3)*0.2273 + (npartons == 4)*0.2104) + (genbosonmass < 50.0)*numberGeneratedEventsWeight*crossSectionPerEventWeight)","z_stitching_weight"))
+        "((genbosonmass >= 50.0)*6.2139e-05*((npartons == 0 || npartons >= 5)*1.0 + (npartons == 1)*0.1743 + (npartons == 2)*0.3556 + (npartons == 3)*0.2273 + (npartons == 4)*0.2104) + (genbosonmass < 50.0)*numberGeneratedEventsWeight*crossSectionPerEventWeight)", "z_stitching_weight"))
     return Selection(name = "DY",
                      weights = DY_process_weights)
 
 
-def DY_nlo_process_selection(channel):
-    DY_nlo_process_weights = DY_base_process_selection(channel).weights
+def dy_nlo(channel):
+    DY_nlo_process_weights = _dy_base(channel).weights
     DY_nlo_process_weights.append((
         "((genbosonmass >= 50.0) * 2.8982e-05 + (genbosonmass < 50.0)*numberGeneratedEventsWeight*crossSectionPerEventWeight)","z_stitching_weight"))
     return Selection(name = "DY_nlo",
                      weights = DY_nlo_process_weights)
 
 
-def ZTT_process_selection(channel):
+def ztt(channel):
     tt_cut = __get_ZTT_cut(channel)
     return Selection(name = "ZTT",
                      cuts = [(tt_cut, "ztt_cut")])
 
-def ZTT_nlo_process_selection(channel):
+def ztt_nlo(channel):
     tt_cut = __get_ZTT_cut(channel)
     return Selection(name = "ZTT_nlo",
                      cuts = [(tt_cut, "ztt_cut")])
@@ -301,7 +254,7 @@ def __get_ZTT_cut(channel):
         return "gen_match_1==4 && gen_match_2==4"
 
 
-def ZTT_embedded_process_selection(channel):
+def ztt_embedded(channel):
     if "mt" in channel:
         ztt_embedded_weights = [
             ("generatorWeight", "simulation_sf"),
@@ -349,17 +302,17 @@ def ZTT_embedded_process_selection(channel):
                      weights = ztt_embedded_weights)
 
 
-def ZL_process_selection(channel):
-    veto = __get_ZL_cut(channel)
+def zl(channel):
+    veto = __get_zl_cut(channel)
     return Selection(name = "ZL",
                      cuts = [("{} && {}".format(*veto), "dy_emb_and_ff_veto")])
 
-def ZL_nlo_process_selection(channel):
-    veto = __get_ZL_cut(channel)
+def zl_nlo(channel):
+    veto = __get_zl_cut(channel)
     return Selection(name = "ZL_nlo",
                      cuts = [("{} && {}".format(*veto), "dy_emb_and_ff_veto")])
 
-def __get_ZL_cut(channel):
+def __get_zl_cut(channel):
     if "mt" in channel:
         emb_veto = "!(gen_match_1==4 && gen_match_2==5)"
         ff_veto = "!(gen_match_2 == 6)"
@@ -378,12 +331,12 @@ def __get_ZL_cut(channel):
     return (emb_veto, ff_veto)
 
 
-def ZJ_process_selection(channel):
+def zj(channel):
     veto = __get_ZJ_cut(channel)
     return Selection(name = "ZJ",
                      cuts = [(__get_ZJ_cut(channel), 'dy_fakes')])
 
-def ZJ_nlo_process_selection(channel):
+def zj_nlo(channel):
     veto = __get_ZJ_cut(channel)
     return Selection(name = "ZJ_nlo",
                      cuts = [(__get_ZJ_cut(channel), 'dy_fakes')])
@@ -399,7 +352,7 @@ def __get_ZJ_cut(channel):
         return ""
 
 
-def TTT_process_selection(channel):
+def ttt(channel):
     if "mt" in channel:
         tt_cut = "gen_match_1==4 && gen_match_2==5"
     elif "et" in channel:
@@ -414,7 +367,7 @@ def TTT_process_selection(channel):
                      cuts = [(tt_cut, "ttt_cut")])
 
 
-def TTL_process_selection(channel):
+def ttl(channel):
     if "mt" in channel:
         emb_veto = "!(gen_match_1==4 && gen_match_2==5)"
         ff_veto = "!(gen_match_2 == 6)"
@@ -434,7 +387,7 @@ def TTL_process_selection(channel):
                      cuts = [("{} && {}".format(emb_veto,ff_veto), "tt_emb_and_ff_veto")])
 
 
-def TTJ_process_selection(channel):
+def ttj(channel):
     ct = ""
     if "mt" in channel or "et" in channel:
         ct = "(gen_match_2 == 6 && gen_match_2 == 6)"
@@ -446,7 +399,7 @@ def TTJ_process_selection(channel):
                      cuts = [(ct, "tt_fakes")])
 
 
-def VVT_process_selection(channel):
+def vvt(channel):
     if "mt" in channel:
         tt_cut = "gen_match_1==4 && gen_match_2==5"
     elif "et" in channel:
@@ -461,7 +414,7 @@ def VVT_process_selection(channel):
                      cuts = [(tt_cut, "vvt_cut")])
 
 
-def VVJ_process_selection(channel):
+def vvj(channel):
     ct = ""
     if "mt" in channel or "et" in channel:
         ct = "(gen_match_2 == 6 && gen_match_2 == 6)"
@@ -473,7 +426,7 @@ def VVJ_process_selection(channel):
                      cuts = [(ct, "vv_fakes")])
 
 
-def VVL_process_selection(channel):
+def vvl(channel):
     if "mt" in channel:
         emb_veto = "!(gen_match_1==4 && gen_match_2==5)"
         ff_veto = "!(gen_match_2 == 6)"
@@ -493,28 +446,28 @@ def VVL_process_selection(channel):
                      cuts = [("{} && {}".format(emb_veto,ff_veto), "tt_emb_and_ff_veto")])
 
 
-def VH_process_selection(channel):
+def vh(channel):
     return Selection(name = "VH",
                      cuts = [("(htxs_stage1p1cat>=300)&&(htxs_stage1p1cat<=505)", "htxs_match")])
 
 
-def WH_process_selection(channel):
+def wh(channel):
     return Selection(name = "WH",
                      cuts = [("(htxs_stage1p1cat>=300)&&(htxs_stage1p1cat<=305)", "htxs_match")])
 
 
-def ZH_process_selection(channel):
+def zh(channel):
     return Selection(name = "ZH",
                      cuts = [("(htxs_stage1p1cat>=400)&&(htxs_stage1p1cat<=405)", "htxs_match")])
 
 
-def ttH_process_selection(channel):
+def tth(channel):
     return Selection(name = "ttH",
-                     weights = HTT_process_selection(channel).weights)
+                     weights = htt(channel).weights)
 
 
-def ggH125_process_selection(channel):
-    ggH125_weights = HTT_base_process_selection(channel).weights + [
+def ggh(channel):
+    ggH125_weights = _htt_base(channel).weights + [
         ("ggh_NNLO_weight", "gghNNLO"),
         ("1.01", "bbh_inclusion_weight"),
         ("((htxs_stage1p1cat==100||htxs_stage1p1cat==102||htxs_stage1p1cat==103)*crossSectionPerEventWeight*8.210e-8+"
@@ -526,11 +479,11 @@ def ggH125_process_selection(channel):
             ")","ggh_stitching_weight")
         ]
     ggH125_cuts = [("(htxs_stage1p1cat>=100)&&(htxs_stage1p1cat<=113)", "htxs")]
-    return Selection(name = "ggH125", weights = ggH125_weights, cuts = ggH125_cuts)
+    return Selection(name = "ggH", weights = ggH125_weights, cuts = ggH125_cuts)
 
 
-def qqH125_process_selection(channel):
-    qqH125_weights = HTT_base_process_selection(channel).weights + [
+def qqh(channel):
+    qqH125_weights = _htt_base(channel).weights + [
         ("(((htxs_stage1p1cat>=200&&htxs_stage1p1cat<=202)||abs(crossSectionPerEventWeight-0.05544)<0.001||abs(crossSectionPerEventWeight-0.052685)<0.001||abs(crossSectionPerEventWeight-0.03342)<0.001)*crossSectionPerEventWeight*numberGeneratedEventsWeight+(abs(crossSectionPerEventWeight-0.05544)>=0.001&&abs(crossSectionPerEventWeight-0.052685)>=0.001&&abs(crossSectionPerEventWeight-0.03342)>=0.001)*("
             "(htxs_stage1p1cat>=203&&htxs_stage1p1cat<=205)*8.70e-9+"
             "(htxs_stage1p1cat==206)*8.61e-9+"
@@ -538,4 +491,4 @@ def qqH125_process_selection(channel):
             "))","qqh_stitching_weight")
         ]
     qqH125_cuts = [("(htxs_stage1p1cat>=200)&&(htxs_stage1p1cat<=210)", "qqH125")]
-    return Selection(name = "qqH125", weights = qqH125_weights, cuts = qqH125_cuts)
+    return Selection(name = "qqH", weights = qqH125_weights, cuts = qqH125_cuts)
